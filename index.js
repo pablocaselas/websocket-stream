@@ -2,6 +2,11 @@ var through = require('through')
 var isBuffer = require('isbuffer')
 var WebSocketPoly = require('ws')
 
+var OPENING=0,
+	OPENED=1,
+	CLOSING=2,
+	CLOSED=3;
+
 function WebsocketStream(server, options) {
   if (!(this instanceof WebsocketStream)) return new WebsocketStream(server, options)
 
@@ -69,7 +74,7 @@ WebsocketStream.prototype.onOpen = function(err) {
 WebsocketStream.prototype.write = function(data) {
   if (!this._open) {
     this._buffer.push(data)
-  } else {
+  } else if (this.ws.readyState!==CLOSED && this.ws.readyState!==CLOSING){
     this._write(data)
   }
 }
